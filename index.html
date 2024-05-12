@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <title>MP4 Video Player</title>
+</head>
+
+<body>
+    <p>MP4 Video Player</p>
+    <canvas id="myCanvas" width="2000px" height="1000px"></canvas>
+    <input type="file" id="fileInput" accept=".mp4, .mp3">
+    <br>
+    <input type="range" id="seekBar" min="0" max="100" value="0">
+    <div class="btncontainer">
+        <button id="pre10s">-10</button>
+        <button id="startButton">start</button>
+        <button id="screenshotButton">SHOT!!</button>
+        <button id="stopButton">stop</button>
+        <button id="next10s">+10</button>
+    </div>
+    <script src="index.js"></script>
+</body>
+
+</body>
+
+<script src="index.js"></script>
+
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+        font-family: 'Noto Sans JP', sans-serif;
+    }
+
+
+    #seekBar {
+        display: block;
+        margin: 0 auto;
+        margin-top: 20px;
+        width: 50%;
+    }
+
+    body {
+        background-color: #000021;
+        color: #fff;
+    }
+
+    video {
+        display: block;
+        margin: 0 auto;
+        margin-top: 20px;
+    }
+
+    input {
+        display: block;
+        margin: 0 auto;
+        margin-top: 20px;
+    }
+
+    .btncontainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    button {
+        background-color: #6823ff;
+        border: none;
+        color: white;
+        padding: 105px 80px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+
+    canvas {
+        display: none;
+        margin: 0 auto;
+        margin-top: 20px;
+        width: 100%;
+    }
+</style>
+
+</html>
