@@ -1,28 +1,184 @@
 <html>
 
 <head>
-    <title>MP4 Video Player</title>
+    <title></title>
 </head>
 
 <body>
-    <p>MP4 Video Player</p>
-    <canvas id="myCanvas" width="2000px" height="1000px"></canvas>
-    <input type="file" id="fileInput" accept=".mp4, .mp3">
-    <br>
-    <input type="range" id="seekBar" min="0" max="100" value="0">
-    <div class="btncontainer">
-        <button id="pre10s">-10</button>
-        <button id="startButton">start</button>
-        <button id="screenshotButton">SHOT!!</button>
-        <button id="stopButton">stop</button>
-        <button id="next10s">+10</button>
+    <video id="SrcVideo"></video>
+    <p id="time"></p>
+    <div class="cont">
+        <div class="btncontainer">
+            <button class="ctlbutton" id="pre10s">-10</button>
+            <button class="ctlbutton" onclick="playMovie()">>||</button>
+            <button class="ctlbutton" id="next10s">+10</button>
+        </div>
+        <div >
+            <button class="shotbtn" onclick="getImage()">screenshot</button>
+            <input type="range" id="seekBar" min="0" max="100" value="0">
+            <input type="file" id="inputfile" accept="video/mp4,video/webm,video/ogg" onchange="onAddFile(event);">
+        </div>
     </div>
-    <script src="index.js"></script>
+    <canvas id="SrcCanvas"></canvas>
 </body>
 
-</body>
 
-<script src="index.js"></script>
+<script>
+    const seekBar = document.getElementById('seekBar');
+    const time = document.getElementById('time');
+    let src_video;
+    let isSeeking = false;
+
+    let played = false;
+
+    let src_canvas;
+    let src_ctx;
+
+    // タイマーのID
+    let interval_id;
+
+    src_canvas = document.getElementById("SrcCanvas");
+    src_ctx = src_canvas.getContext("2d");
+
+    src_video = document.getElementById("SrcVideo");
+
+
+    // 停止
+    function stopMovie() {
+        src_video.pause();
+    }
+
+    function playMovie() {
+        try {
+            if (!played) {
+                src_video.play();
+                played = true;
+                drawFrame();
+            } else {
+                src_video.pause();
+                played = false;
+            }
+        } catch (e) {
+            failalert('no file selected!');
+        }
+    }
+
+
+    // ユーザーによりファイルが追加された  
+    function onAddFile(event) {
+        var files;
+        var filename;
+
+        if (event.target.files) {
+            files = event.target.files;
+        } else {
+            files = event.dataTransfer.files;
+        }
+
+        if (files[0] != undefined) {
+            filename = files[0].name;
+
+            // 拡張子の取得 
+            var ext = filename.split('.');
+            ext = ext[ext.length - 1].toUpperCase();
+
+            // 動画が再生できる状態になった時
+            src_video.onloadeddata = function () {
+
+                // 最大横幅を640にする
+                var size = 2000;
+                if (src_video.videoWidth > size) {
+                    var aspectratio = src_video.videoWidth / size;
+                    var another = Math.round(src_video.videoHeight / aspectratio);
+
+                    src_video.width = size;
+                    src_video.height = another;
+                } else {
+                    src_video.width = src_video.videoWidth;
+                    src_video.height = src_video.videoHeight;;
+                }
+
+                console.log(src_video.duration);
+                src_canvas.width = src_video.width;
+                src_canvas.height = src_video.height;
+                seekBar.max = src_video.duration;
+                // 再生      
+                drawFrame();
+                console.log();
+            };
+
+            src_video.onerror = function (e) {
+                alert('このファイルは読み込めません。');
+            };
+
+            // 以前のURLオブジェクトを削除する
+            if (src_video.src) {
+                src_video.pause();
+                window.URL.revokeObjectURL(src_video.src);
+            }
+
+            // MIMEを指定して動画を読み込む
+            var mime = "video/mp4";
+            if (ext == "WEBM") {
+                mime = "video/webm";
+            } else if (ext == "OGG" || ext == "OGX" || ext == "OGV") {
+                mime = "video/ogg";
+            }
+            src_video.src = URL.createObjectURL(new Blob([files[0]], { type: mime }));
+        } else {
+        }
+        document.getElementById("inputfile").value = '';
+    }
+    seekBar.addEventListener('input', () => {
+        isSeeking = true;
+        src_video.currentTime = seekBar.value;
+    });
+
+    seekBar.addEventListener('change', () => {
+        isSeeking = false;
+        drawFrame();
+    });
+    function getImage() {
+        const filedate = new Date();
+        const h = filedate.getHours();
+        const m = filedate.getMinutes();
+        const s = filedate.getSeconds();
+        if (src_video) {
+            const dataURL = src_canvas.toDataURL('image/png'); // PNG形式でデータURLを取得
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = `screenshot-${h}${m}${s}.png`; // ファイル名を指定
+            link.click(); // リンクをクリックしてダウンロード
+        } else {
+            failalert('no file selected!');
+        }
+    };
+
+
+    pre10s.addEventListener('click', () => {
+        if (src_video) {
+            src_video.currentTime -= 10;
+        }
+    });
+
+    next10s.addEventListener('click', () => {
+        if (src_video) {
+            src_video.currentTime += 10;
+        }
+    });
+
+    function drawFrame() {
+        if (src_video && !src_video.paused && !isSeeking) {
+            src_ctx.drawImage(src_video, 0, 0, src_canvas.width, src_canvas.height);
+            seekBar.value = src_video.currentTime;
+            requestAnimationFrame(drawFrame);
+        }
+    }
+
+    function failalert(msg) {
+        alert(msg);
+    }
+</script>
 
 <style>
     * {
@@ -36,7 +192,7 @@
         display: block;
         margin: 0 auto;
         margin-top: 20px;
-        width: 50%;
+        width: 100%;
     }
 
     body {
@@ -45,9 +201,7 @@
     }
 
     video {
-        display: block;
-        margin: 0 auto;
-        margin-top: 20px;
+        display: none;
     }
 
     input {
@@ -56,23 +210,37 @@
         margin-top: 20px;
     }
 
-    .btncontainer {
+    .cont {
+        position: fixed;
         display: flex;
+        width: 100%;
+        height: 50%;
         justify-content: center;
-        margin-top: 20px;
+        align-items: center;
+        padding: 0 50% 0 0;
     }
 
-    button {
-        background-color: #6823ff;
+    .btncontainer {
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        width: 100%;
+    }
+
+    .ctlbutton {
+        background-color: #6823ff44;
         border: none;
         color: white;
-        padding: 105px 80px;
+        padding: 50px 50px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
         font-size: 16px;
         margin: 4px 2px;
         cursor: pointer;
+        border-radius: 50%;
     }
 
     canvas {
@@ -80,6 +248,16 @@
         margin: 0 auto;
         margin-top: 20px;
         width: 100%;
+    }
+
+    .shotbtn {
+        display: block;
+        margin: 0 auto;
+        margin-top: 20px;
+        background-color: #6823ff;
+        color: #fff;
+        border: none;
+        padding: 20px;
     }
 </style>
 
