@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <title>Touch Event Test</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function (e) {
+            e.preventDefault(); // block default event
+            let touchAreaPrev = document.getElementById('touchArea-prev');
+            let touchAreaNext = document.getElementById('touchArea-next');
+            const log = document.getElementById('log')
+            let ongoingTouches = [];
+            // prev touch event
+            touchAreaPrev.addEventListener('touchstart', function (event) {
+                event.preventDefault();
+                log.innerHTML = 'touchstart.';
+                const touches = event.changedTouches;
+            });
+            // next touch event
+
+        });
+    </script>
+</head>
+
+<body>
+    <div style="display: flex;  background-color: lightgray;">
+        <div id="touchArea-prev" style="width: 50%; height: 100vh; z-index: 999;">
+            Touch here
+            <p id="log"></p>
+        </div>
+        <div id="touchArea-next" style="width: 50%; height: 100vh; z-index: 999;">
+            Touch here
+        </div>
+    </div>
+</body>
+
+</html>
