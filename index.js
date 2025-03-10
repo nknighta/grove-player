@@ -103,7 +103,7 @@ seekBar.addEventListener('change', () => {
     drawFrame();
 });
 function getImage() {
-    const filedate = new Date();
+    const filedate = new Date()
     const h = filedate.getHours();
     const m = filedate.getMinutes();
     const s = filedate.getSeconds();
@@ -111,7 +111,7 @@ function getImage() {
         const dataURL = src_canvas.toDataURL('image/png'); // PNG形式でデータURLを取得
         const link = document.createElement('a');
         link.href = dataURL;
-        link.download = `screenshot-${h}${m}${s}.png`; // ファイル名を指定
+        link.download = `screenshot-${h}${m}${s}-groveplayer.png`; // ファイル名を指定
         link.click(); // リンクをクリックしてダウンロード
     } else {
         failalert('no file selected!');
